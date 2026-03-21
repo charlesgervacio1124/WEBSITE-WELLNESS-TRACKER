@@ -38,15 +38,28 @@ export const Home = () => {
   }
 
   // Ensure todayData has valid numeric values
-  const water = typeof todayData.water === 'number' ? todayData.water : 0;
-  const sleep = typeof todayData.sleep === 'number' ? todayData.sleep : 0;
-  const steps = typeof todayData.steps === 'number' ? todayData.steps : 0;
+  const water = parseFloat(todayData.water) || 0;
+  const sleep = parseFloat(todayData.sleep) || 0;
+  const steps = parseFloat(todayData.steps) || 0;
 
   const sleepHours = Math.floor(sleep / 60);
   const sleepMinutes = sleep % 60;
   const sleepProgress = (sleep / sleepGoal) * 100;
   const waterProgress = (water / waterGoal) * 100;
   const stepsProgress = (steps / stepsGoal) * 100;
+
+  let sleepQuality = "Needs Improvement";
+  if (sleepProgress >= 100) sleepQuality = "Excellent";
+  else if (sleepProgress >= 70) sleepQuality = "Good";
+
+  let hydrationLevel = "Low";
+  if (waterProgress >= 100) hydrationLevel = "Excellent";
+  else if (waterProgress >= 70) hydrationLevel = "Good";
+
+  let activityLevel = "Low";
+  if (stepsProgress >= 100) activityLevel = "Excellent";
+  else if (stepsProgress >= 70) activityLevel = "Good";
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -156,15 +169,15 @@ export const Home = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
                 <span className="text-sm text-gray-700">Sleep Quality</span>
-                <span className="font-bold text-purple-600">Excellent</span>
+                <span className="font-bold text-purple-600">{sleepQuality}</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-cyan-50 rounded-lg">
                 <span className="text-sm text-gray-700">Hydration Level</span>
-                <span className="font-bold text-cyan-600">Good</span>
+                <span className="font-bold text-cyan-600">{hydrationLevel}</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                 <span className="text-sm text-gray-700">Activity Level</span>
-                <span className="font-bold text-blue-600">Low</span>
+                <span className="font-bold text-blue-600">{activityLevel}</span>
               </div>
             </div>
           </div>

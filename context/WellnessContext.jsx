@@ -14,6 +14,22 @@ import {
   serverTimestamp
 } from 'firebase/firestore';
 
+const parseSleep = (sleep) => {
+  if (typeof sleep === 'number') return sleep;
+  if (!sleep) return 0;
+  if (typeof sleep === 'string') {
+    const matchOriginal = sleep.match(/(\d+)\s*h\s*(\d+)\s*m/i);
+    if (matchOriginal) {
+      return parseInt(matchOriginal[1], 10) * 60 + parseInt(matchOriginal[2], 10);
+    }
+    const matchHours = sleep.match(/(\d+)\s*h/i);
+    if (matchHours) {
+      return parseInt(matchHours[1], 10) * 60;
+    }
+  }
+  return parseFloat(sleep) || 0;
+};
+
 const WellnessContext = createContext();
 
 export const WellnessProvider = ({ children }) => {
@@ -110,9 +126,9 @@ export const WellnessProvider = ({ children }) => {
         // Ensure all values are numbers
         setTodayData({
           date: data.date || today,
-          sleep: typeof data.sleep === 'number' ? data.sleep : 0,
-          water: typeof data.water === 'number' ? data.water : 0,
-          steps: typeof data.steps === 'number' ? data.steps : 0,
+          sleep: typeof data.sleep === 'number' ? data.sleep : parseSleep(data.sleep),
+          water: typeof data.water === 'number' ? data.water : parseFloat(data.water) || 0,
+          steps: typeof data.steps === 'number' ? data.steps : parseInt(data.steps, 10) || 0,
         });
       } else {
         console.log('WellnessContext: No today data, using defaults');
@@ -150,7 +166,14 @@ export const WellnessProvider = ({ children }) => {
       console.log('WellnessContext: Found', querySnap.size, 'history documents');
       const historyData = [];
       querySnap.forEach((doc) => {
-        historyData.push({ id: doc.id, ...doc.data() });
+        const data = doc.data();
+        historyData.push({ 
+          ...data,
+          id: doc.id,
+          sleep: typeof data.sleep === 'number' ? data.sleep : parseSleep(data.sleep),
+          water: typeof data.water === 'number' ? data.water : parseFloat(data.water) || 0,
+          steps: typeof data.steps === 'number' ? data.steps : parseInt(data.steps, 10) || 0,
+        });
       });
       
       const sorted = historyData.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -174,6 +197,19 @@ export const WellnessProvider = ({ children }) => {
       await setDoc(wellnessRef, newData, { merge: true });
       
       setTodayData(newData);
+      
+      // Update history list immediately
+      setHistory(prev => {
+        const index = prev.findIndex(item => item.date === today);
+        let newHistory;
+        if (index >= 0) {
+          newHistory = [...prev];
+          newHistory[index] = newData;
+        } else {
+          newHistory = [...prev, newData];
+        }
+        return newHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+      });
     } catch (error) {
       console.error('Error updating wellness data:', error);
     }

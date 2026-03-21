@@ -3,7 +3,7 @@ import { useWellness } from '../context/WellnessContext.jsx';
 import { Moon, TrendingUp } from 'lucide-react';
 
 export const Sleep = () => {
-  const { todayData, sleepGoal, setSleep, updateGoals } = useWellness();
+  const { todayData, sleepGoal, setSleep, updateGoals, history } = useWellness();
   const [showGoalDialog, setShowGoalDialog] = useState(false);
   const [showSleepDialog, setShowSleepDialog] = useState(false);
   const [newGoal, setNewGoal] = useState(sleepGoal);
@@ -13,6 +13,26 @@ export const Sleep = () => {
   const sleepMinutes = todayData.sleep % 60;
   const goalHours = Math.floor(sleepGoal / 60);
   const sleepProgress = (todayData.sleep / sleepGoal) * 100;
+
+  const formatTime = (minutes) => {
+    if (!minutes || isNaN(minutes)) return "0h 0m";
+    const hours = Math.floor(minutes / 60);
+    const mins = Math.floor(minutes % 60);
+    return `${hours}h ${mins}m`;
+  };
+
+  const totalSleep = history.reduce((sum, h) => sum + (parseFloat(h.sleep) || 0), 0);
+  const avgSleep = history.length > 0 ? totalSleep / history.length : 0;
+  const avgSleepText = formatTime(avgSleep);
+
+  const last7Days = history.slice(0, 7);
+  const weeklyTotal = last7Days.reduce((sum, h) => sum + (parseFloat(h.sleep) || 0), 0);
+  const weeklyAvg = last7Days.length > 0 ? weeklyTotal / last7Days.length : 0;
+  const weeklyAvgText = formatTime(weeklyAvg);
+
+  let sleepQuality = "Needs Improvement";
+  if (sleepProgress >= 100) sleepQuality = "Excellent";
+  else if (sleepProgress >= 70) sleepQuality = "Good";
 
   const handleSetGoal = async () => {
     await updateGoals({ sleepGoal: newGoal });
@@ -90,15 +110,15 @@ export const Sleep = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
                   <span className="text-sm text-gray-700">Average Sleep</span>
-                  <span className="font-bold text-purple-600">7h 45m</span>
+                  <span className="font-bold text-purple-600">{avgSleepText}</span>
                 </div>
                 <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
                   <span className="text-sm text-gray-700">Sleep Quality</span>
-                  <span className="font-bold text-purple-600">Excellent</span>
+                  <span className="font-bold text-purple-600">{sleepQuality}</span>
                 </div>
                 <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
                   <span className="text-sm text-gray-700">Weekly Average</span>
-                  <span className="font-bold text-purple-600">8h 5m</span>
+                  <span className="font-bold text-purple-600">{weeklyAvgText}</span>
                 </div>
               </div>
             </div>
