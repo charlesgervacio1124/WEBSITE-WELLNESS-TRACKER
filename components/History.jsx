@@ -1,39 +1,12 @@
 import { useWellness } from '../context/WellnessContext';
 import { Calendar, ActivitySquare } from 'lucide-react';
+import { LoadingScreen } from './LoadingScreen';
 
 export const History = () => {
   const { history, loading } = useWellness();
 
   if (loading) {
-    return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        width: '100%',
-        background: '#f0f0f0',
-        fontFamily: 'Arial, sans-serif'
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{
-            width: '60px',
-            height: '60px',
-            background: '#007bff',
-            borderRadius: '50%',
-            margin: '0 auto 20px',
-            animation: 'pulse-animation 1.5s ease-in-out infinite'
-          }}></div>
-          <p style={{ color: '#000', fontSize: '16px', fontWeight: 'bold' }}>Loading history...</p>
-          <style>{`
-            @keyframes pulse-animation {
-              0%, 100% { opacity: 0.6; }
-              50% { opacity: 1; }
-            }
-          `}</style>
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Loading history..." />;
   }
 
   const formatTime = (minutes) => {

@@ -12,17 +12,21 @@ import { Profile } from './components/Profile';
 import { Login } from './components/Login';
 import { Signup } from './components/Signup';
 import { Navigation } from './components/Navigation';
+import { TopNav } from './components/TopNav';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 // DashboardLayout wrapper for pages that need navigation
 const DashboardLayout = ({ children }) => {
   return (
-    <div className="flex min-h-screen">
-      <Navigation />
-      <div className="ml-64 flex-1">
-        {children}
+    <>
+      <TopNav />
+      <div className="flex pt-32 px-8 max-w-[1600px] mx-auto gap-10 min-h-screen">
+        <Navigation />
+        <main className="flex-1 pb-12 w-full max-w-full overflow-hidden">
+          {children}
+        </main>
       </div>
-    </div>
+    </>
   );
 };
 

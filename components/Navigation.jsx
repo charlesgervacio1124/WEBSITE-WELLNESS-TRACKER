@@ -1,78 +1,61 @@
-import { Home, Clock, Moon, Droplet, Footprints, Activity, User } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 export const Navigation = () => {
   const location = useLocation();
 
+  const getLinkClass = (path) => {
+    const isActive = location.pathname === path;
+    if (isActive) {
+      return "flex items-center gap-4 px-4 py-3 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/20 transition-all";
+    }
+    return "flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-blue-100/50 font-bold transition-all group";
+  };
+
+  const getIconClass = (path) => {
+    const isActive = location.pathname === path;
+    return `material-symbols-outlined ${isActive ? 'material-symbols-fill' : 'group-hover:text-primary'}`;
+  };
+
   return (
-    <nav className="fixed left-0 top-0 bottom-0 w-64 bg-gradient-to-b from-blue-500 to-purple-600 text-white p-6 flex flex-col">
-      <div className="flex flex-col items-center gap-4 mb-10 pb-4 border-b border-white/20">
-        <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center">
-          <Activity className="w-7 h-7" />
+    <aside className="hidden lg:flex flex-col w-64 shrink-0 gap-10">
+      <div className="flex flex-col gap-6">
+        <div className="px-2">
+          <h3 className="text-[10px] font-extrabold text-primary uppercase tracking-[0.2em] mb-4">Core Trackers</h3>
+          <nav className="flex flex-col gap-2">
+            <Link to="/" className={getLinkClass('/')}>
+              <span className={getIconClass('/')}>grid_view</span>
+              <span className="text-sm">Dashboard</span>
+            </Link>
+            <Link to="/steps" className={getLinkClass('/steps')}>
+              <span className={getIconClass('/steps')}>directions_run</span>
+              <span className="text-sm">Steps</span>
+            </Link>
+            <Link to="/sleep" className={getLinkClass('/sleep')}>
+              <span className={getIconClass('/sleep')}>nights_stay</span>
+              <span className="text-sm">Sleep</span>
+            </Link>
+            <Link to="/water" className={getLinkClass('/water')}>
+              <span className={getIconClass('/water')}>opacity</span>
+              <span className="text-sm">Water Intake</span>
+            </Link>
+          </nav>
         </div>
-        <h1 className="font-bold text-2xl tracking-wide text-center">WELLNESS TRACKER</h1>
+        <div className="px-2">
+          <h3 className="text-[10px] font-extrabold text-primary uppercase tracking-[0.2em] mb-4">Settings</h3>
+          <nav className="flex flex-col gap-2">
+            <Link to="/history" className={getLinkClass('/history')}>
+              <span className={getIconClass('/history')}>history</span>
+              <span className="text-sm">History</span>
+            </Link>
+            <Link to="/profile" className={getLinkClass('/profile')}>
+              <span className={getIconClass('/profile')}>person</span>
+              <span className="text-sm">Profile</span>
+            </Link>
+          </nav>
+        </div>
       </div>
 
-      <div className="space-y-2 flex-1">
-        <Link
-          to="/"
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-            location.pathname === '/' ? 'bg-white/20' : 'hover:bg-white/10'
-          }`}
-        >
-          <Home className="w-5 h-5" />
-          <span>Dashboard</span>
-        </Link>
-        <Link
-          to="/sleep"
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-            location.pathname === '/sleep' ? 'bg-white/20' : 'hover:bg-white/10'
-          }`}
-        >
-          <Moon className="w-5 h-5" />
-          <span>Sleep</span>
-        </Link>
-        <Link
-          to="/water"
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-            location.pathname === '/water' ? 'bg-white/20' : 'hover:bg-white/10'
-          }`}
-        >
-          <Droplet className="w-5 h-5" />
-          <span>Water</span>
-        </Link>
-        <Link
-          to="/steps"
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-            location.pathname === '/steps' ? 'bg-white/20' : 'hover:bg-white/10'
-          }`}
-        >
-          <Footprints className="w-5 h-5" />
-          <span>Steps</span>
-        </Link>
-        <Link
-          to="/history"
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-            location.pathname === '/history' ? 'bg-white/20' : 'hover:bg-white/10'
-          }`}
-        >
-          <Clock className="w-5 h-5" />
-          <span>History</span>
-        </Link>
-        <Link
-          to="/profile"
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-            location.pathname === '/profile' ? 'bg-white/20' : 'hover:bg-white/10'
-          }`}
-        >
-          <User className="w-5 h-5" />
-          <span>Profile</span>
-        </Link>
-      </div>
 
-      <div className="pt-6 border-t border-white/20">
-        <p className="text-sm opacity-70">Wellness Tracker v1.0</p>
-      </div>
-    </nav>
+    </aside>
   );
 };
