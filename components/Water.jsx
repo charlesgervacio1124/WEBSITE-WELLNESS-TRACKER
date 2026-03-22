@@ -3,13 +3,30 @@ import { useWellness } from '../context/WellnessContext.jsx';
 import { Droplet, Plus, TrendingUp } from 'lucide-react';
 
 export const Water = () => {
-  const { todayData, waterGoal, addWaterIntake, updateGoals } = useWellness();
+  const { todayData, waterGoal, addWaterIntake, updateGoals, history } = useWellness();
   const [showGoalDialog, setShowGoalDialog] = useState(false);
   const [showIntakeDialog, setShowIntakeDialog] = useState(false);
   const [newGoal, setNewGoal] = useState(waterGoal);
   const [intakeAmount, setIntakeAmount] = useState(0.25);
 
-  const waterProgress = (todayData.water / waterGoal) * 100;
+  const activeWaterGoal = todayData.waterGoal || waterGoal;
+  const waterProgress = (todayData.water / activeWaterGoal) * 100;
+
+  let waterCategory = todayData.waterCategory;
+  if (!waterCategory) {
+    if (waterProgress >= 100) waterCategory = "Excellent";
+    else if (waterProgress >= 70) waterCategory = "Good";
+    else waterCategory = "Needs Improvement";
+  }
+
+  let waterStatus = todayData.waterStatus;
+  if (!waterStatus) {
+    waterStatus = waterProgress >= 100 ? "Hydrated" : "Dehydrated";
+  }
+
+  const totalWater = history.reduce((sum, h) => sum + (parseFloat(h.water) || 0), 0);
+  const avgWater = history.length > 0 ? totalWater / history.length : 0;
+  const avgWaterText = `${avgWater.toFixed(1)}L`;
 
   const handleSetGoal = async () => {
     await updateGoals({ waterGoal: newGoal });
@@ -50,7 +67,7 @@ export const Water = () => {
               <div>
                 <div className="flex justify-between mb-2">
                   <span className="text-sm text-gray-700">Daily Goal</span>
-                  <span className="text-sm font-bold text-cyan-600">{waterGoal.toFixed(1)}L</span>
+                  <span className="text-sm font-bold text-cyan-600">{activeWaterGoal.toFixed(1)}L</span>
                 </div>
                 <div className="relative h-4 bg-cyan-200 rounded-full overflow-hidden">
                   <div
@@ -94,7 +111,7 @@ export const Water = () => {
                   Add Custom
                 </button>
                 <button
-                  onClick={() => setShowGoalDialog(true)}
+                  onClick={() => { setNewGoal(activeWaterGoal); setShowGoalDialog(true); }}
                   className="bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors"
                 >
                   Set Goal
@@ -113,15 +130,15 @@ export const Water = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-cyan-50 rounded-lg">
                   <span className="text-sm text-gray-700">Daily Average</span>
-                  <span className="font-bold text-cyan-600">1.8L</span>
+                  <span className="font-bold text-cyan-600">{avgWaterText}</span>
                 </div>
                 <div className="flex items-center justify-between p-4 bg-cyan-50 rounded-lg">
                   <span className="text-sm text-gray-700">Hydration Level</span>
-                  <span className="font-bold text-cyan-600">Good</span>
+                  <span className="font-bold text-cyan-600">{waterCategory}</span>
                 </div>
                 <div className="flex items-center justify-between p-4 bg-cyan-50 rounded-lg">
-                  <span className="text-sm text-gray-700">Weekly Average</span>
-                  <span className="font-bold text-cyan-600">2.0L</span>
+                  <span className="text-sm text-gray-700">Hydration Status</span>
+                  <span className="font-bold text-cyan-600">{waterStatus}</span>
                 </div>
               </div>
             </div>

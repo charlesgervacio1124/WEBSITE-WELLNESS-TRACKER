@@ -9,17 +9,17 @@ export const History = () => {
     return <LoadingScreen message="Loading history..." />;
   }
 
-  const formatTime = (minutes) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}h ${mins}m`;
+  const formatTime = (hours) => {
+    const h = Math.floor(hours || 0);
+    const mins = Math.round(((hours || 0) % 1) * 60);
+    return `${h}h ${mins}m`;
   };
 
   const totalSleep = history.reduce((sum, h) => sum + (typeof h.sleep === 'number' ? h.sleep : parseFloat(h.sleep) || 0), 0);
   const totalWater = history.reduce((sum, h) => sum + (typeof h.water === 'number' ? h.water : parseFloat(h.water) || 0), 0);
   const totalSteps = history.reduce((sum, h) => sum + (typeof h.steps === 'number' ? h.steps : parseFloat(h.steps) || 0), 0);
 
-  const avgSleep = history.length > 0 ? formatTime(Math.floor(totalSleep / history.length)) : "0h 0m";
+  const avgSleep = history.length > 0 ? formatTime(totalSleep / history.length) : "0h 0m";
   const avgWater = history.length > 0 ? (totalWater / history.length).toFixed(1) : "0.0";
   const avgSteps = history.length > 0 ? Math.floor(totalSteps / history.length).toLocaleString() : "0";
 

@@ -16,7 +16,7 @@ import {
 import { LoadingScreen } from '../components/LoadingScreen';
 
 const parseSleep = (sleep) => {
-  if (typeof sleep === 'number') return sleep;
+  if (typeof sleep === 'number') return sleep > 24 ? sleep / 60 : sleep;
   if (!sleep) return 0;
   if (typeof sleep === 'string') {
     const matchOriginal = sleep.match(/(\d+)\s*h\s*(\d+)\s*m/i);
@@ -42,7 +42,7 @@ export const WellnessProvider = ({ children }) => {
     steps: 0,
   });
 
-  const [sleepGoal, setSleepGoal] = useState(480); // 8 hours in minutes
+  const [sleepGoal, setSleepGoal] = useState(8); // 8 hours
   const [waterGoal, setWaterGoal] = useState(8); // 8 liters
   const [stepsGoal, setStepsGoal] = useState(10000);
   const [history, setHistory] = useState([]);
@@ -67,7 +67,7 @@ export const WellnessProvider = ({ children }) => {
         if (userSnap.exists()) {
           const userData = userSnap.data();
           console.log('WellnessContext: User data found:', userData);
-          setSleepGoal(userData.sleepGoal || 480);
+          setSleepGoal(userData.sleepGoal || 8);
           setWaterGoal(userData.waterGoal || 8);
           setStepsGoal(userData.stepsGoal || 10000);
         } else {
@@ -75,7 +75,7 @@ export const WellnessProvider = ({ children }) => {
           // Create new user document
           await setDoc(userRef, {
             email: currentUser.email,
-            sleepGoal: 480,
+            sleepGoal: 8,
             waterGoal: 8,
             stepsGoal: 10000,
             createdAt: serverTimestamp(),
@@ -126,8 +126,9 @@ export const WellnessProvider = ({ children }) => {
         console.log('WellnessContext: Today data found:', data);
         // Ensure all values are numbers
         setTodayData({
+          ...data,
           date: data.date || today,
-          sleep: typeof data.sleep === 'number' ? data.sleep : parseSleep(data.sleep),
+          sleep: parseSleep(data.sleep),
           water: typeof data.water === 'number' ? data.water : parseFloat(data.water) || 0,
           steps: typeof data.steps === 'number' ? data.steps : parseInt(data.steps, 10) || 0,
         });
@@ -171,7 +172,7 @@ export const WellnessProvider = ({ children }) => {
         historyData.push({ 
           ...data,
           id: doc.id,
-          sleep: typeof data.sleep === 'number' ? data.sleep : parseSleep(data.sleep),
+          sleep: parseSleep(data.sleep),
           water: typeof data.water === 'number' ? data.water : parseFloat(data.water) || 0,
           steps: typeof data.steps === 'number' ? data.steps : parseInt(data.steps, 10) || 0,
         });

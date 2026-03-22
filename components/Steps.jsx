@@ -7,10 +7,18 @@ export const Steps = () => {
   const [showStepsDialog, setShowStepsDialog] = useState(false);
   const [stepsInput, setStepsInput] = useState(0);
   const stepsProgress = (todayData.steps / stepsGoal) * 100;
-  const distance = ((todayData.steps / 1000) * 0.8).toFixed(2);
-  const calories = Math.round(todayData.steps * 0.05);
-  const activeTime = Math.round(todayData.steps / 100);
-  const avgPace = todayData.steps > 0 ? (activeTime / distance).toFixed(1) : 0;
+  const rawDistance = todayData.distance || ((todayData.steps / 1000) * 0.8);
+  const distance = parseFloat(rawDistance).toFixed(2);
+  
+  let activeTimeFormatted;
+  if (todayData.timeMillis) {
+    const totalSeconds = Math.floor(todayData.timeMillis / 1000);
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    activeTimeFormatted = `${mins}:${secs.toString().padStart(2, '0')}`;
+  } else {
+    activeTimeFormatted = `${Math.round((todayData.steps || 0) / 100)}:00`;
+  }
 
   const handleAddSteps = async () => {
     const newSteps = parseInt(stepsInput);
@@ -114,16 +122,8 @@ export const Steps = () => {
                   <span className="font-bold text-blue-600">{distance} km</span>
                 </div>
                 <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-                  <span className="text-sm text-gray-700">Calories</span>
-                  <span className="font-bold text-blue-600">{calories} kcal</span>
-                </div>
-                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-                  <span className="text-sm text-gray-700">Active Time</span>
-                  <span className="font-bold text-blue-600">{activeTime} min</span>
-                </div>
-                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-                  <span className="text-sm text-gray-700">Avg. Pace</span>
-                  <span className="font-bold text-blue-600">{avgPace} min/km</span>
+                  <span className="text-sm text-gray-700">Active Time (Min/Sec)</span>
+                  <span className="font-bold text-blue-600">{activeTimeFormatted}</span>
                 </div>
               </div>
             </div>

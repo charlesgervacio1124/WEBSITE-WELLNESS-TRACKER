@@ -17,10 +17,11 @@ export const Home = () => {
   const sleep = parseFloat(todayData.sleep) || 0;
   const steps = parseFloat(todayData.steps) || 0;
 
-  const sleepHours = Math.floor(sleep / 60);
-  const sleepMinutes = Math.floor(sleep % 60);
+  const sleepHours = Math.floor(sleep);
+  const sleepMinutes = Math.round((sleep % 1) * 60);
   
-  const sleepProgress = Math.min((sleep / sleepGoal) * 100, 100) || 0;
+  const activeSleepGoal = todayData.sleepGoal || sleepGoal;
+  const sleepProgress = Math.min((sleep / activeSleepGoal) * 100, 100) || 0;
   const waterProgress = Math.min((water / waterGoal) * 100, 100) || 0;
   const stepsProgress = Math.min((steps / stepsGoal) * 100, 100) || 0;
 
@@ -42,15 +43,15 @@ export const Home = () => {
 
   const totalSleepRecent = recentHistory.reduce((sum, h) => sum + (parseFloat(h.sleep) || 0), 0);
   const avgSleepRecent = recentHistory.length > 0 ? totalSleepRecent / recentHistory.length : sleep;
-  const avgSleepHours = Math.floor(avgSleepRecent / 60);
-  const avgSleepMinutes = Math.floor(avgSleepRecent % 60);
-  const maxSleep = Math.max(...recentHistory.map(h => parseFloat(h.sleep) || 0), sleepGoal, 1);
+  const avgSleepHours = Math.floor(avgSleepRecent);
+  const avgSleepMinutes = Math.round((avgSleepRecent % 1) * 60);
+  const maxSleep = Math.max(...recentHistory.map(h => parseFloat(h.sleep) || 0), activeSleepGoal, 1);
 
   // Wellness Trends calculation (Overall goal completion over last 7 days)
   const wellnessTrendData = [...recentHistory].map(h => {
     const sP = Math.min((parseFloat(h.steps) || 0) / stepsGoal, 1) * 100;
     const wP = Math.min((parseFloat(h.water) || 0) / waterGoal, 1) * 100;
-    const slP = Math.min((parseFloat(h.sleep) || 0) / sleepGoal, 1) * 100;
+    const slP = Math.min((parseFloat(h.sleep) || 0) / (h.sleepGoal || sleepGoal), 1) * 100;
     return {
       score: Math.round((sP + wP + slP) / 3),
       date: new Date(h.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
@@ -77,7 +78,17 @@ export const Home = () => {
 
   // Typing Effect
   const [typedText, setTypedText] = React.useState('');
-  const fullText = `Good morning, ${nameCapitalized}.`;
+  
+  const getGreeting = () => {
+    const phTime = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+    const hour = phTime.getHours();
+    
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
+  
+  const fullText = `${getGreeting()}, ${nameCapitalized}.`;
 
   React.useEffect(() => {
     let i = 0;
@@ -153,7 +164,7 @@ export const Home = () => {
               <span className="text-[10px] font-extrabold text-sapphire uppercase tracking-widest">Sleep Analysis</span>
             </div>
             <div className="px-4 py-2 bg-sapphire/5 rounded-full">
-              <span className="text-[10px] font-extrabold text-sapphire">GOAL: {Math.floor(sleepGoal/60)}H</span>
+              <span className="text-[10px] font-extrabold text-sapphire">GOAL: {activeSleepGoal}H</span>
             </div>
           </div>
           
@@ -165,7 +176,7 @@ export const Home = () => {
                 <div key={i} className="flex-1 flex flex-col items-center gap-3 h-full group/bar">
                   <div className="w-full relative flex flex-col justify-end h-full">
                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded-md z-20">
-                      {Math.floor(h_sleep/60)}h {Math.floor(h_sleep%60)}m
+                      {Math.floor(h_sleep)}h {Math.round((h_sleep % 1) * 60)}m
                     </div>
                     <div style={{ height: `${height}%` }} 
                       className={`w-full rounded-xl transition-all duration-500 bg-gradient-to-t ${h_sleep >= sleepGoal ? 'from-sapphire to-primary' : 'from-blue-200 to-blue-300'}`}>
