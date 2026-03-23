@@ -5,7 +5,8 @@ import {
   signOut,
   onAuthStateChanged,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { auth, db } from '../firebase/config';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
@@ -18,7 +19,7 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState('');
 
   // Sign up
-  const signup = async (email, password, name) => {
+  const signup = async (email, password, name, birthdate, sex) => {
     try {
       setError('');
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -27,6 +28,8 @@ export const AuthProvider = ({ children }) => {
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         email: email,
         name: name,
+        birthdate: birthdate || null,
+        sex: sex || null,
         sleepGoal: 480,
         waterGoal: 8,
         stepsGoal: 10000,
@@ -88,6 +91,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Reset Password
+  const resetPassword = async (email) => {
+    try {
+      setError('');
+      await sendPasswordResetEmail(auth, email);
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
   // Track auth state
   useEffect(() => {
     console.log('AuthProvider: Starting auth state listener');
@@ -117,6 +131,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     loginWithGoogle,
+    resetPassword,
     error,
     setError
   };

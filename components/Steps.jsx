@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useWellness } from '../context/WellnessContext.jsx';
-import { Footprints, ZoomIn, ZoomOut, Locate, TrendingUp } from 'lucide-react';
+import { Footprints, TrendingUp } from 'lucide-react';
 
 export const Steps = () => {
   const { todayData, stepsGoal, setSteps } = useWellness();
@@ -71,42 +71,6 @@ export const Steps = () => {
               </div>
             </div>
 
-            {/* Map */}
-            <div className="relative bg-white rounded-2xl overflow-hidden h-96 shadow-sm border border-gray-200">
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200">
-                <div className="absolute top-0 left-0 w-full h-full opacity-20">
-                  <div className="absolute top-1/4 left-0 w-full h-1 bg-gray-400"></div>
-                  <div className="absolute top-1/2 left-0 w-full h-2 bg-gray-500"></div>
-                  <div className="absolute top-3/4 left-0 w-full h-1 bg-gray-400"></div>
-                  <div className="absolute left-1/4 top-0 h-full w-1 bg-gray-400"></div>
-                  <div className="absolute left-1/2 top-0 h-full w-1 bg-gray-400"></div>
-                  <div className="absolute left-3/4 top-0 h-full w-1 bg-gray-400"></div>
-                </div>
-                
-                {/* Current location marker */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <div className="w-6 h-6 bg-blue-500 rounded-full border-4 border-white shadow-lg"></div>
-                </div>
-
-                {/* Map controls */}
-                <div className="absolute bottom-6 right-6 flex flex-col gap-2">
-                  <button className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-50 transition-colors">
-                    <ZoomIn className="w-5 h-5 text-gray-700" />
-                  </button>
-                  <button className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-50 transition-colors">
-                    <ZoomOut className="w-5 h-5 text-gray-700" />
-                  </button>
-                  <button className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-50 transition-colors">
-                    <Locate className="w-5 h-5 text-gray-700" />
-                  </button>
-                </div>
-
-                {/* Map attribution */}
-                <div className="absolute bottom-3 left-3 text-xs text-gray-500 bg-white px-2 py-1 rounded shadow">
-                  Google Maps
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Step Statistics */}
